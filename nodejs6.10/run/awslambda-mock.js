@@ -9,12 +9,14 @@ try {
 } catch (e) {
 }
 var EVENT_BODY = READ_BODY || process.argv[3] || process.env.AWS_LAMBDA_EVENT_BODY || '{}'
+var EXTRA_ENV = process.argv[4]
 
 var FN_NAME = process.env.AWS_LAMBDA_FUNCTION_NAME || 'test'
 var VERSION = process.env.AWS_LAMBDA_FUNCTION_VERSION || '$LATEST'
 var MEM_SIZE = process.env.AWS_LAMBDA_FUNCTION_MEMORY_SIZE || '1536'
 var TIMEOUT = process.env.AWS_LAMBDA_FUNCTION_TIMEOUT || '300'
-var REGION = process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || 'us-east-1'
+var REGION = process.env
+.AWS_REGION || process.env.AWS_DEFAULT_REGION || 'us-east-1'
 var ACCOUNT_ID = process.env.AWS_ACCOUNT_ID || randomAccountId()
 var ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID || 'SOME_ACCESS_KEY_ID'
 var SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY || 'SOME_SECRET_ACCESS_KEY'
@@ -52,6 +54,13 @@ process.env.AWS_LAMBDA_LOG_STREAM_NAME = new Date().toISOString().slice(0, 10).r
 process.env.AWS_REGION = REGION
 process.env.AWS_DEFAULT_REGION = REGION
 process.env._HANDLER = HANDLER
+process.env.EXTRA_ENV = EXTRA_ENV
+if (EXTRA_ENV) {
+  EXTRA_ENV = JSON.parse(process.env.EXTRA_ENV);
+  for (var key of Object.keys(EXTRA_ENV)) {
+    process.env[key] = EXTRA_ENV[key];
+  }
+}
 
 var OPTIONS = {
   initInvokeId: uuid(),
